@@ -168,34 +168,55 @@ export default function Home() {
           case 'list': {
             const nextIndent = (listContext?.indent || 0) + 1;
             t.items.forEach((item: any, idx: number) => {
-              // Item.text may already contain concatenated inline text; nested content is in item.tokens
               const marker = t.ordered ? `${item.start !== undefined ? item.start : idx + 1}. ` : '• ';
-              const itemInline = formatInline(item.text || '');
+              const tokensInItem = Array.isArray(item.tokens) ? item.tokens : [];
+
+              // Identify the primary line token for the bullet (first non-space, non-list token with text)
+              let primaryTokenIndex = -1;
+              for (let i = 0; i < tokensInItem.length; i++) {
+                const tk = tokensInItem[i];
+                if ((tk.text || tk.type === 'text' || tk.type === 'paragraph') && tk.type !== 'space' && tk.type !== 'list') {
+                  primaryTokenIndex = i; break;
+                }
+              }
+              let primaryText = '';
+              if (primaryTokenIndex >= 0) {
+                primaryText = tokensInItem[primaryTokenIndex].text || '';
+              } else if (item.text) {
+                // Fallback: use first line of item.text only (prevents nested list text concatenation)
+                primaryText = String(item.text).split(/\n| {2,}/)[0].trim();
+              }
+              const primaryRuns = formatInline(primaryText);
               paragraphs.push(new Paragraph({
-                children: [new TextRun({ text: marker, size: baseFontSize, font: baseFont, color: baseColor }), ...itemInline],
+                children: [new TextRun({ text: marker, size: baseFontSize, font: baseFont, color: baseColor }), ...primaryRuns],
                 indent: { left: nextIndent * 720 },
                 spacing: { after: 40 },
               }));
-              if (item.tokens) {
-                // Filter out leading tokens that duplicate the list item's own text content
-                const itemTextNorm = (item.text || '').replace(/\s+/g, ' ').trim();
-                const filtered = item.tokens.filter((tok: any, i: number) => {
-                  if (i === 0 && tok.text) {
-                    const tokNorm = String(tok.text).replace(/\s+/g, ' ').trim();
-                    if (tokNorm === itemTextNorm) return false; // duplicate
+
+              // Remaining tokens: render nested lists or additional paragraphs WITHOUT duplicating the bullet text
+              const remaining = tokensInItem.filter((_: any, i: number) => i !== primaryTokenIndex).filter((tk: any) => tk.type !== 'space');
+              if (remaining.length) {
+                remaining.forEach((rt: any) => {
+                  if (rt.type === 'list') {
+                    // Nested list
+                    walk([rt], { ordered: rt.ordered, indent: nextIndent });
+                  } else if (rt.type === 'paragraph' && rt.text && rt.text.trim()) {
+                    // Additional paragraph inside same list item (indent slightly more, no bullet)
+                    paragraphs.push(new Paragraph({
+                      children: formatInline(rt.text),
+                      indent: { left: (nextIndent + 0.5) * 720 },
+                      spacing: { after: 80 },
+                    }));
+                  } else if (rt.type === 'code') {
+                    paragraphs.push(new Paragraph({
+                      children: [new TextRun({ text: rt.text, font: { name: 'Consolas' }, size: baseFontSize, color: baseColor })],
+                      indent: { left: (nextIndent + 0.5) * 720 },
+                      spacing: { after: 80 },
+                    }));
+                  } else if (rt.type === 'blockquote') {
+                    walk(rt.tokens.map((x: any) => ({ ...x, _blockquote: true })), { ordered: t.ordered, indent: nextIndent + 1 });
                   }
-                  // Also skip simple 'paragraph' token duplicating the list text
-                  if (tok.type === 'paragraph' && tok.text) {
-                    const tokNorm2 = String(tok.text).replace(/\s+/g, ' ').trim();
-                    if (tokNorm2 === itemTextNorm) return false;
-                  }
-                  // Skip trivial space tokens
-                  if (tok.type === 'space') return false;
-                  return true;
                 });
-                if (filtered.length) {
-                  walk(filtered, { ordered: t.ordered, indent: nextIndent });
-                }
               }
             });
             break; }
