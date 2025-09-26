@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Simple prose styles for rendered markdown */
+.prose {
+  max-width: 800px;
+}
+.prose h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.prose h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.prose h3 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+.prose p { margin: 0.5rem 0; }
+.prose ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
+.prose ol { list-style: decimal; padding-left: 1.25rem; margin: 0.5rem 0; }
+.prose li { margin: 0.25rem 0; }
+.prose code { background: rgba(0,0,0,.08); padding: 2px 6px; border-radius: 4px; }
+.prose pre { background: rgba(0,0,0,.08); padding: 12px; border-radius: 6px; overflow: auto; }
+.prose blockquote { border-left: 4px solid rgba(0,0,0,.2); padding-left: 12px; color: rgba(0,0,0,.7); }
+
