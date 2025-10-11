@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## ClassM8 — Frontend (Next.js)
 
-## Getting Started
+Interfaz web para subir audios de reuniones o clases universitarias y generar resúmenes didácticos. Los resúmenes se muestran en la UI con formato tipo markdown (títulos, subtítulos, listas, negritas, etc.) y pueden exportarse a DOCX.
 
-First, run the development server:
+Estado del proyecto: no está desplegado públicamente. Se puede ejecutar localmente junto con el backend.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech stack
+
+- Next.js
+- Tailwind CSS v4
+- NestJS (backend API)
+- PostgreSQL (planeado para persistencia futura)
+- OpenAI
+
+## Requisitos
+
+- Node.js LTS y npm
+- Repositorio del Backend: https://github.com/BrunoChampionGalvez/classm8-back
+
+## Configuración rápida
+
+1) Crea un archivo `.env.local` en la carpeta `front/` con:
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2) Instala dependencias y levanta el servidor de desarrollo en el puerto 3001:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3) Asegúrate de tener el backend ejecutándose en paralelo en el puerto 3000. La UI estará disponible en http://localhost:3001.
 
-## Learn More
+## Uso
 
-To learn more about Next.js, take a look at the following resources:
+1) Regístrate o inicia sesión para obtener un token JWT.
+2) Sube un archivo de audio (m4a, wav, mp3, aac, caf, ogg). Si es muy grande, el backend intentará particionarlo con ffmpeg/ffprobe.
+3) Visualiza el resumen generado y utiliza el botón para exportar a DOCX.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Desarrollo: `npm run dev`
+- Build: `npm run build`
+- Producción: `npm start`
+- Lint: `npm run lint`
 
-## Deploy on Vercel
+## Notas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Este proyecto está pensado para ejecutarse localmente junto con el backend. No hay despliegue público por ahora.
+- Cambia `NEXT_PUBLIC_API_URL` si el backend corre en otra URL/puerto.
